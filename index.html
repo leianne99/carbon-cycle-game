@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carbon Cycle Impact Sorter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #2f4f4f;
+    }
+    .bins {
+      display: flex;
+      justify-content: center;
+      gap: 50px;
+      margin-top: 30px;
+    }
+    .bin {
+      width: 250px;
+      height: 300px;
+      border: 3px dashed #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      background-color: #ffffff;
+    }
+    .bin h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .positive {
+      border-color: #4CAF50;
+      background-color: #e8f5e9;
+    }
+    .negative {
+      border-color: #f44336;
+      background-color: #ffebee;
+    }
+    .item {
+      background-color: #dcdcdc;
+      margin: 8px;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: grab;
+    }
+    #items {
+      margin-top: 30px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    #score {
+      font-weight: bold;
+      font-size: 20px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sort the Human Impacts on the Carbon Cycle</h1>
+  <p>Drag and drop each item into the correct trash bin!</p>
+
+  <div id="items"></div>
+
+  <div class="bins">
+    <div class="bin positive" ondrop="drop(event)" ondragover="allowDrop(event)" data-type="positive">
+      <h2>🟩 Positive Impact</h2>
+    </div>
+    <div class="bin negative" ondrop="drop(event)" ondragover="allowDrop(event)" data-type="negative">
+      <h2>🟥 Negative Impact</h2>
+    </div>
+  </div>
+
+  <div id="score">Score: 0 / 7</div>
+
+  <script>
+    const itemsData = [
+      { text: "Planting trees", type: "positive" },
+      { text: "Using recycled paper", type: "positive" },
+      { text: "Practicing sustainable forestry", type: "positive" },
+      { text: "Burning fossil fuels", type: "negative" },
+      { text: "Forest fires caused by human activity", type: "negative" },
+      { text: "Using clean energy (solar/wind)", type: "positive" },
+      { text: "Converting forests into shopping malls", type: "negative" },
+    ];
+
+    let score = 0;
+    let totalItems = itemsData.length;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function loadItems() {
+      const container = document.getElementById("items");
+      const shuffled = shuffle(itemsData);
+      shuffled.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.textContent = item.text;
+        div.setAttribute("draggable", true);
+        div.setAttribute("data-type", item.type);
+        div.setAttribute("id", `item-${index}`);
+        div.ondragstart = drag;
+        container.appendChild(div);
+      });
+    }
+
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    function drag(ev) {
+      ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      const data = ev.dataTransfer.getData("text");
+      const droppedItem = document.getElementById(data);
+      const binType = ev.currentTarget.getAttribute("data-type");
+      const itemType = droppedItem.getAttribute("data-type");
+
+      if (binType === itemType) {
+        ev.currentTarget.appendChild(droppedItem);
+        score++;
+        document.getElementById("score").textContent = `Score: ${score} / ${totalItems}`;
+        droppedItem.setAttribute("draggable", false);
+        droppedItem.style.backgroundColor = "#c8e6c9";
+      } else {
+        alert("Incorrect bin! Try again.");
+      }
+
+      if (score === totalItems) {
+        setTimeout(() => {
+          alert("🎉 All items sorted correctly! Well done!");
+        }, 300);
+      }
+    }
+
+    loadItems();
+  </script>
+</body>
+</html>
